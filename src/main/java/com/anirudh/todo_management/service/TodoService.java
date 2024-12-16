@@ -18,4 +18,5 @@ public interface TodoService {
 
     TodoDto completeTask(Long id);
 
+    TodoDto inCompleteTask(Long id);
 }

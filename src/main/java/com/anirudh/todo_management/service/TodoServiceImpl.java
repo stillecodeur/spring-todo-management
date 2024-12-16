@@ -14,10 +14,14 @@ import java.util.stream.Collectors;
 @Service
 public class TodoServiceImpl implements TodoService {
 
-    @Autowired
-    private TodoRepository repository;
 
+    private TodoRepository repository;
     private ModelMapper modelMapper;
+
+    public TodoServiceImpl(TodoRepository repository, ModelMapper modelMapper) {
+        this.repository = repository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public TodoDto createTodo(TodoDto todoDto) {
@@ -39,9 +43,9 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public TodoDto updateTodo(TodoDto todoDto) {
-        Todo todo = repository.findById(todoDto.id()).orElseThrow(() -> new RuntimeException("Todo doesn't exist"));
-        todo.setTitle(todoDto.title());
-        todo.setDescription(todoDto.description());
+        Todo todo = repository.findById(todoDto.getId()).orElseThrow(() -> new RuntimeException("Todo doesn't exist"));
+        todo.setTitle(todoDto.getTitle());
+        todo.setDescription(todoDto.getDescription());
         return modelMapper.map(todo, TodoDto.class);
     }
 
@@ -55,6 +59,14 @@ public class TodoServiceImpl implements TodoService {
     public TodoDto completeTask(Long id) {
         Todo todo = repository.findById(id).orElseThrow(() -> new RuntimeException("Todo doesn't exist"));
         todo.setCompleted(Boolean.TRUE);
+        Todo todoUpdated = repository.save(todo);
+        return modelMapper.map(todoUpdated, TodoDto.class);
+    }
+
+    @Override
+    public TodoDto inCompleteTask(Long id) {
+        Todo todo = repository.findById(id).orElseThrow(() -> new RuntimeException("Todo doesn't exist"));
+        todo.setCompleted(Boolean.FALSE);
         Todo todoUpdated = repository.save(todo);
         return modelMapper.map(todoUpdated, TodoDto.class);
     }

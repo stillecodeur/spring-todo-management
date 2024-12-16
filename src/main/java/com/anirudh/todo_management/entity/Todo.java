@@ -14,11 +14,11 @@ import lombok.Setter;
 public class Todo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "title",nullable = false)
+    @Column(name = "title")
     private String title;
-    @Column(name = "description",nullable = false)
+    @Column(name = "description")
     private String description;
     private boolean completed;
 }
