@@ -1,6 +1,8 @@
 package com.anirudh.todo_management.config;
 
 import com.anirudh.todo_management.security.CustomUserDetailsService;
+import com.anirudh.todo_management.security.JwtAuthenticationEntryPoint;
+import com.anirudh.todo_management.security.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -24,6 +27,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SpringSecurityConfig {
 
     private UserDetailsService customUserDetailsService;
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private JwtAuthenticationFilter authenticationFilter;
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
@@ -40,8 +45,15 @@ public class SpringSecurityConfig {
 //                    authorize.requestMatchers(HttpMethod.GET,"/api/**").hasAnyRole("ADMIN","USER");
 //                    authorize.requestMatchers(HttpMethod.PATCH,"/api/**").hasAnyRole("ADMIN","USER");
                     authorize.requestMatchers("/api/auth/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.OPTIONS,"/**").permitAll();
                     authorize.anyRequest().authenticated();
                 }).httpBasic(Customizer.withDefaults());
+
+        httpSecurity.exceptionHandling(exception->{
+           exception.authenticationEntryPoint(authenticationEntryPoint);
+        });
+
+        httpSecurity.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
